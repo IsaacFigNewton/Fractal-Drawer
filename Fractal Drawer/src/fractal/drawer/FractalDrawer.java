@@ -23,14 +23,27 @@ public class FractalDrawer {
     
     public static void main(String[] args) {
         //create the GUI and canvas
-        CanvasGUI GUI = new CanvasGUI();
+        CanvasGUI c = new CanvasGUI();
         
         //set the canvas up
-        GUI.stroke(Color.BLACK);
-        GUI.setBackground(Color.WHITE);
+        c.stroke(Color.BLACK);
+        c.setBackground(Color.WHITE);
         
         //draw on the canvas
-        GUI.line(100, 100, 400, 400);
+        //infinite loop drawing because apparently the program hates single-time drawing
+        int i = 1;
+        
+        while (true) {
+        c.line(100, 100, 400, 400);
+               
+        //a bunch of circles, because why not
+        c.circle(2000/i, 2000/i, 100);
+        if (i>100)
+            i = 1;
+        
+        i++;
+        }
+        
         //Take user input for desired fractal among list of fractals or just have user drag line to make fractal
         
     }

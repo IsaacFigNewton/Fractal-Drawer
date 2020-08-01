@@ -12,11 +12,8 @@ import javax.swing.*;
  * @author Owner
  */
 public class CanvasGUI {
-    public String fractalType = "custom";
     //create the Canvas
     private Canvas c = new Canvas();
-    //get the canvas's Graphics to draw with
-    private Graphics g = c.getGraphics();
     //add features to GUI to allow for zoom, color changing, and more
     //constructor
     public CanvasGUI(){
@@ -27,21 +24,23 @@ public class CanvasGUI {
 
         //Creating the MenuBar and save as button
         JMenuBar mb = new JMenuBar();
-        JMenu save = new JMenu("Save as");
+        JButton save = new JButton("Save As");
         mb.add(save);
 
         //Creating the panel at bottom and adding components
         JPanel panel = new JPanel(); // the panel is not visible in output
-        JLabel label = new JLabel("Enter desired fractal type");
-        JTextField textField = new JTextField(10); // accepts upto 10 characters
-        JButton enterType = new JButton("Enter");
-        JButton resetText = new JButton("Reset");
+        JLabel label = new JLabel("Fractal-Drawing Method");
+        JButton lineType = new JButton("Line");
+        JButton shapeType = new JButton("Shape/Add Lobe");
+        JButton addRecursionSize = new JButton("Increase Recursion Size");
+        JButton removeRecursionSize = new JButton("Decrease Recursion Size");
         
         // Components added to the bottom panel using Flow Layout
-        panel.add(label); 
-        panel.add(textField);
-        panel.add(enterType);
-        panel.add(resetText);
+        panel.add(label);
+        panel.add(lineType);
+        panel.add(shapeType);
+        panel.add(addRecursionSize);
+        panel.add(removeRecursionSize);
 
         //Adding Components to the frame.
         frame.getContentPane().add(BorderLayout.SOUTH, panel);
@@ -52,21 +51,21 @@ public class CanvasGUI {
     
     //class setters
     public void stroke(Color theColor) {
-        g.setColor(theColor);
+        c.getGraphics().setColor(theColor);
     }
     public void setBackground(Color theColor) {
         c.setBackground(theColor);
     }
     public void line(int x1, int y1, int x2, int y2) {
-        g.drawLine(x1, y1, x2, y2);
+        c.getGraphics().drawLine(x1, y1, x2, y2);
     }
     public void circle(int x, int y, int r) {
-        Graphics2D g2 = (Graphics2D) g;
+        Graphics2D g2 = (Graphics2D) c.getGraphics();
         Shape circle = new Ellipse2D.Double(x, y, r, r);
         g2.draw(circle);
     }
     public void rect(int x1, int y1, int x2, int y2) {
-        Graphics2D g2 = (Graphics2D) g;
+        Graphics2D g2 = (Graphics2D) c.getGraphics();
         Shape rect = new Rectangle(x1, y1, x2, y2);
         g2.draw(rect);
     }
@@ -76,6 +75,6 @@ public class CanvasGUI {
     
     //toString returns current fractal type
     public String toString() {
-        return fractalType;
+        return "";
     }
 }
