@@ -1,41 +1,82 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+ * Copyright (c) 1995, 2008, Oracle and/or its affiliates. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ *   - Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *
+ *   - Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *
+ *   - Neither the name of Oracle or the names of its
+ *     contributors may be used to endorse or promote products derived
+ *     from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+ * IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */ 
+
 package fractal.drawer;
 
-//import images.APImage;
-//import images.Pixel;
-//import java.io.*;
+/*
+ * MouseMotionEventDemo.java
+ *
+ */
 import fractal.drawer.*;
-import fractal.drawer.Mouse;
-import fractal.drawer.Mouse2;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
-/**
- *
- * @author Owner
- */
-public class FractalDrawer {
-//    public static APImage theImage = new APImage("placeholder.jpg");
+import java.awt.Canvas;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseEvent;
+import java.awt.GridLayout;
+
+import javax.swing.*;
+
+public class FractalDrawer extends JPanel implements MouseMotionListener {
     
-    /**
-     * @param args the command line arguments
-     */
+    JTextArea textArea;
+    static final String NEWLINE = System.getProperty("line.separator");
+    
     //create the Canvas
     private static Canvas c = new Canvas();
-    // create a mouse listener
-    public static Mouse borders = new Mouse();
-    public static Mouse2 location = new Mouse2(); 
     //save the mouse's location within the canvas
     public static int mouseX = 0;
     public static int mouseY = 0;
     public static boolean inCanvas = false;
     
     public static void main(String[] args) {
+        //Schedule a job for the event dispatch thread:
+        //creating and showing this application's GUI.
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                GUI();
+            }
+        });
+    }
+    
+    /**
+     * Create the GUI and show it.  For thread safety,
+     * this method should be invoked from the
+     * event-dispatching thread.
+     */
+    private static void GUI() {
         //create the GUI and canvas
         //Creating the Frame
         JFrame frame = new JFrame("Fractal Drawer");
@@ -62,9 +103,8 @@ public class FractalDrawer {
         panel.add(addRecursionSize);
         panel.add(removeRecursionSize);
         
-        // add mouseListener and mouseMotionListeners to the frame 
-        frame.addMouseListener(borders);
-        frame.addMouseMotionListener(location);
+        // add mouseMotionListener to the frame 
+        c.addMouseMotionListener(new FractalDrawer());
 
         //Adding Components to the frame.
         frame.getContentPane().add(BorderLayout.SOUTH, panel);
@@ -73,22 +113,15 @@ public class FractalDrawer {
         frame.setVisible(true);
         //set the canvas up
         stroke(Color.BLACK);
-        setBackground(Color.WHITE);
+        c.setBackground(Color.WHITE);
         
-        //draw on the canvas
-        //infinite loop drawing because apparently the program hates single-time drawing
-        while (true) {
-            //update mouse location
-            Mouse2.mouseMoved(location);
-            line((1*getCanvasWidth())/8, (1*getCanvasHeight())/8, (7*getCanvasWidth())/8, (7*getCanvasHeight())/8);
-               
-            //a circle
-            circle(getCanvasWidth()/2-20, getCanvasHeight()/2-20, mouseX);
-        
-        }
-        
-        //Take user input for desired fractal among list of fractals or just have user drag line to make fractal
-        
+        //Display the window.
+        frame.pack();
+        frame.setVisible(true);
+    }
+    
+    public FractalDrawer() {
+        addMouseMotionListener(this);
     }
     
     //class getters
@@ -102,12 +135,11 @@ public class FractalDrawer {
         return c.getHeight();
     }
     
-    
     //class setters
     public static void stroke(Color theColor) {
         c.getGraphics().setColor(theColor);
     }
-    public static void setBackground(Color theColor) {
+    public void setBackground(Color theColor) {
         c.setBackground(theColor);
     }
     
@@ -126,19 +158,30 @@ public class FractalDrawer {
         g2.draw(rect);
     }
 
-    //other methods
-    
-    //toString returns current fractal type
-    public String toString() {
-        return "";
+    //mouseMovedListener methods
+    void eventOutput(String eventDescription, MouseEvent e) {
+        System.out.println(eventDescription
+                + " (" + e.getX() + "," + e.getY() + ")"
+                + " detected on "
+                + e.getComponent().getClass().getName());
     }
     
+    public void mouseMoved(MouseEvent e) {
+        eventOutput("Mouse moved to", e);
+    }
+    
+    public void mouseDragged(MouseEvent e) {
+        eventOutput("Mouse dragged to", e);
+        //for drawing
+        circle(e.getX(), e.getY(), 10);
+    }
 }
 
-/*                                 sources:
-Template:           SLOHS, SLO, CA.
-Drawing tools:      I don't remember
-Mouse events:       https://www.geeksforgeeks.org/mouselistener-mousemotionlistener-java/
+/*                                 Sources:
+********************************************************************************
+Template:                       SLOHS, SLO, CA.
+Drawing tools:                  I don't remember
+Mouse events:                   https://www.geeksforgeeks.org/mouselistener-mousemotionlistener-java/
+Mouse Motion Listener Tutorial: https://docs.oracle.com/javase/tutorial/uiswing/examples/events/index.html#MouseMotionEventDemo
 
 */
-
