@@ -54,11 +54,12 @@ public class FractalDrawer extends JPanel implements MouseMotionListener {
     JTextArea textArea;
     static final String NEWLINE = System.getProperty("line.separator");
     
-    //create the Canvas
+    //create the Canvas and Fractal
     private static Canvas c = new Canvas();
+    private static Fractal f = new Fractal(c);
     //save the mouse's location within the canvas
-    public static int mouseX = 0;
-    public static int mouseY = 0;
+    public static int mouseX = c.getWidth()/2;
+    public static int mouseY = c.getHeight()/2;
     public static boolean inCanvas = false;
     
     public static void main(String[] args) {
@@ -91,15 +92,62 @@ public class FractalDrawer extends JPanel implements MouseMotionListener {
         //Creating the panel at bottom and adding components
         JPanel panel = new JPanel(); // the panel is not visible in output
         JLabel label = new JLabel("Fractal-Drawing Method");
+        //buttons
         JButton lineType = new JButton("Line");
-        JButton shapeType = new JButton("Shape/Add Lobe");
+        JButton shapeType = new JButton("Change Shape");
+        JButton addLobe = new JButton("Add Lobe");
         JButton addRecursionSize = new JButton("Increase Recursion Size");
         JButton removeRecursionSize = new JButton("Decrease Recursion Size");
+        
+        //add button listeners
+        save.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                //save picture of canvas in some way
+            }
+        });
+        lineType.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Fractal.type = 0;
+            }
+        });
+        shapeType.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (Fractal.type < 2)
+                    Fractal.type++;
+                else
+                    Fractal.type = 1;
+            }
+        });
+        addLobe.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (Fractal.lobeCount < 10)
+                    Fractal.lobeCount++;
+                else
+                    Fractal.lobeCount = 1;
+            }
+        });
+        addRecursionSize.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (Fractal.recursions < 50)
+                    Fractal.recursions++;
+                else
+                    Fractal.recursions = 1;
+            }
+        });
+        removeRecursionSize.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (Fractal.recursions > 0)
+                    Fractal.recursions--;
+                else
+                    Fractal.recursions = 50;
+            }
+        });
         
         // Components added to the bottom panel using Flow Layout
         panel.add(label);
         panel.add(lineType);
         panel.add(shapeType);
+        panel.add(addLobe);
         panel.add(addRecursionSize);
         panel.add(removeRecursionSize);
         
@@ -157,6 +205,11 @@ public class FractalDrawer extends JPanel implements MouseMotionListener {
         Shape rect = new Rectangle(x1, y1, x2, y2);
         g2.draw(rect);
     }
+    public static void fillRect(int x1, int y1, int x2, int y2) {
+        Graphics2D g2 = (Graphics2D) c.getGraphics();
+        g2.setColor(Color.WHITE);
+        g2.fillRect(x1, y1, x2, y2);
+    }
 
     //mouseMovedListener methods
     void eventOutput(String eventDescription, MouseEvent e) {
@@ -167,13 +220,25 @@ public class FractalDrawer extends JPanel implements MouseMotionListener {
     }
     
     public void mouseMoved(MouseEvent e) {
-        eventOutput("Mouse moved to", e);
+//        eventOutput("Mouse moved to", e);
     }
     
     public void mouseDragged(MouseEvent e) {
-        eventOutput("Mouse dragged to", e);
-        //for drawing
-        circle(e.getX(), e.getY(), 10);
+        //debugging
+//        eventOutput("Mouse dragged to", e);
+        
+//        int range = 100;
+//        //only function if the cursor is clicked and dragged some distance from the last point of contact, for continuity sake
+//        if(Math.abs(mouseX - e.getX()) <= range && Math.abs(mouseY - e.getY()) <= range) {
+        //for class
+        mouseX = e.getX();
+        mouseY = e.getY();
+
+        //clear canvas
+        fillRect(0, 0, c.getWidth(), c.getHeight());
+        //draw fractal
+        Fractal.draw(c, e.getX(), e.getY());
+//        }
     }
 }
 
@@ -183,5 +248,6 @@ Template:                       SLOHS, SLO, CA.
 Drawing tools:                  I don't remember
 Mouse events:                   https://www.geeksforgeeks.org/mouselistener-mousemotionlistener-java/
 Mouse Motion Listener Tutorial: https://docs.oracle.com/javase/tutorial/uiswing/examples/events/index.html#MouseMotionEventDemo
+Button Listeners:               https://stackoverflow.com/questions/21879243/how-to-create-on-click-event-for-buttons-in-swing/21879526
 
 */
