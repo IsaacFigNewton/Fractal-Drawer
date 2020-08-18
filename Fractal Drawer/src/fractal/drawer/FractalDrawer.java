@@ -128,7 +128,7 @@ public class FractalDrawer extends JPanel implements MouseMotionListener {
         });
         addRecursionSize.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (Fractal.recursions < 50)
+                if (Fractal.recursions < 20)
                     Fractal.recursions++;
                 else
                     Fractal.recursions = 1;
@@ -210,6 +210,9 @@ public class FractalDrawer extends JPanel implements MouseMotionListener {
         g2.setColor(Color.WHITE);
         g2.fillRect(x1, y1, x2, y2);
     }
+    public static void clearCanvas() {
+        fillRect(0, 0, c.getWidth(), c.getHeight());
+    }
 
     //mouseMovedListener methods
     void eventOutput(String eventDescription, MouseEvent e) {
@@ -249,5 +252,6 @@ Drawing tools:                  I don't remember
 Mouse events:                   https://www.geeksforgeeks.org/mouselistener-mousemotionlistener-java/
 Mouse Motion Listener Tutorial: https://docs.oracle.com/javase/tutorial/uiswing/examples/events/index.html#MouseMotionEventDemo
 Button Listeners:               https://stackoverflow.com/questions/21879243/how-to-create-on-click-event-for-buttons-in-swing/21879526
+Angle Calculation:              https://stackoverflow.com/questions/9970281/java-calculating-the-angle-between-two-points-in-degrees
 
 */
