@@ -51,16 +51,11 @@ import javax.swing.*;
 
 public class FractalDrawer extends JPanel implements MouseMotionListener {
     
-    JTextArea textArea;
-    static final String NEWLINE = System.getProperty("line.separator");
-    
     //create the Canvas and Fractal
     private static Canvas c = new Canvas();
-    private static Fractal f = new Fractal(c);
     //save the mouse's location within the canvas
     public static int mouseX = c.getWidth()/2;
     public static int mouseY = c.getHeight()/2;
-    public static boolean inCanvas = false;
     
     public static void main(String[] args) {
         //Schedule a job for the event dispatch thread:
@@ -200,9 +195,9 @@ public class FractalDrawer extends JPanel implements MouseMotionListener {
         Shape circle = new Ellipse2D.Double(x, y, r, r);
         g2.draw(circle);
     }
-    public static void rect(int x1, int y1, int x2, int y2) {
+    public static void rect(int x, int y, int width, int height) {
         Graphics2D g2 = (Graphics2D) c.getGraphics();
-        Shape rect = new Rectangle(x1, y1, x2, y2);
+        Shape rect = new Rectangle(x, y, width, height);
         g2.draw(rect);
     }
     public static void fillRect(int x1, int y1, int x2, int y2) {
@@ -247,8 +242,7 @@ public class FractalDrawer extends JPanel implements MouseMotionListener {
 
 /*                                 Sources:
 ********************************************************************************
-Template:                       SLOHS, SLO, CA.
-Drawing tools:                  I don't remember
+Template and drawing tools:     SLOHS, SLO, CA.
 Mouse events:                   https://www.geeksforgeeks.org/mouselistener-mousemotionlistener-java/
 Mouse Motion Listener Tutorial: https://docs.oracle.com/javase/tutorial/uiswing/examples/events/index.html#MouseMotionEventDemo
 Button Listeners:               https://stackoverflow.com/questions/21879243/how-to-create-on-click-event-for-buttons-in-swing/21879526

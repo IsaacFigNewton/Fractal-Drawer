@@ -150,7 +150,7 @@ public class Fractal {
     }
     public static void rect(int x, int y, int width, int height) {
         Graphics2D g2 = (Graphics2D) c.getGraphics();
-        Shape rect = new Rectangle(x, y, x + width, y + height);
+        Shape rect = new Rectangle(x, y, width, height);
         g2.draw(rect);
     }
     public static void fillRect(int x1, int y1, int x2, int y2) {
