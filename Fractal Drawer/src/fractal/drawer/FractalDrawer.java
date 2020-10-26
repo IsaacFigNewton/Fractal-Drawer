@@ -46,6 +46,10 @@ import java.awt.Dimension;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseEvent;
 import java.awt.GridLayout;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 
 import javax.swing.*;
 
@@ -81,7 +85,7 @@ public class FractalDrawer extends JPanel implements MouseMotionListener {
 
         //Creating the MenuBar and save as button
         JMenuBar mb = new JMenuBar();
-        JButton save = new JButton("Save As");
+        JButton save = new JButton("Save Drawing");
         mb.add(save);
 
         //Creating the panel at bottom and adding components
@@ -96,8 +100,24 @@ public class FractalDrawer extends JPanel implements MouseMotionListener {
         
         //add button listeners
         save.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent e){
+                try {
                 //save picture of canvas in some way
+//                BufferedImage img;
+//                for (int y = 0; y < c.getHeight(); y++) {
+//                    for (int x = 0; x < c.getWidth(); x++) {
+//                        img.setRGB(x, y, c.getPixelRGB(x, y));
+//                    }
+//                }
+                Container pane = frame;
+                BufferedImage img = new BufferedImage(pane.getWidth(), pane.getHeight(), BufferedImage.TYPE_INT_RGB);
+                Graphics2D g2d = img.createGraphics();
+                pane.printAll(g2d);
+                g2d.dispose();
+                saveDrawing(img);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
             }
         });
         lineType.addActionListener(new ActionListener() {
@@ -237,6 +257,15 @@ public class FractalDrawer extends JPanel implements MouseMotionListener {
         //draw fractal
         Fractal.draw(c, e.getX(), e.getY());
 //        }
+    }
+    
+    //Other methods
+    private static void saveDrawing (BufferedImage img) throws IOException {
+        try {
+            ImageIO.write(img, "png", new File("Saved Images\\save.png"));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 }
 
