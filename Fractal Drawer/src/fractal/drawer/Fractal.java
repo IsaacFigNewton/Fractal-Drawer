@@ -6,7 +6,9 @@
 package fractal.drawer;
 
 import fractal.drawer.*;
+import static fractal.drawer.FPointList.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.geom.Ellipse2D;
 /**
  *
@@ -14,95 +16,216 @@ import java.awt.geom.Ellipse2D;
  */
 public class Fractal {
     private static Canvas c = new Canvas();
+    public static Graphics2D ctx = (Graphics2D) c.getGraphics();
     public static int type = 0;
     public static int recursions = 10;
     public static int lobeCount = 2;
     public static int size = 100;
+        
+    //Ben Harding's Code here
+    //constants
+    public static int RecursiveConstructerLength = 700;
+    public static double startAngle = 7 * Math.PI / 4;
+    public static double startLength = Math.sqrt(2) * 350;
+
+    //initializing things
+    public static int mouseX = 400;
+    public static int mouseY = 350;
+    public static int x = 0;
+    public static int y = 0;
+    public static int originX = 0;
+    public static int originY = 0;
     
-    public Fractal(Canvas canvas) {
-        c = canvas;
+    public static int flipA = 2;
+    public static int flipB = 2;
+
+    public static double fracAngle = startAngle;
+    public static double fracLength = startLength;
+    public static double angle = startAngle;
+    public static double length = startLength;
+
+    public static Point [] pointArray;
+    public static int currentPoint = 0;
+    public static int iterations = 7;
+    public static int currentType;
+    public static Fractal fractal;
+
+    public static Point nextPoint;
+    
+    public static int screen = 1;
+
+//    BaseList;
+//    recList;
+//    recEnd;
+    
+    public Fractal(Fractal f, Point nextP) {
+        fractal = f;
+        nextPoint = nextP;
+    }
+    
+    public Fractal (int centerX, int centerY, Point [] base, int recurse, int flipB, int [] points, int startingPoint, int iterations) {
+        //add stuff here
+    }
+    
+    //class drawing tools
+    public static void stroke(Color theColor) {
+        c.getGraphics().setColor(theColor);
+    }
+    public static void moveTo(int X, int Y) {
+        originX = X;
+        originY = Y;
+    }
+    public static void line(int x1, int y1, int x2, int y2) {
+        c.getGraphics().drawLine(originX + x1, originX + y1, originX + x2, originX + y2);
+    }
+    public static void circle(int x, int y, int r) {
+        Graphics2D g2 = (Graphics2D) c.getGraphics();
+        Shape circle = new Ellipse2D.Double(originX + x, originX + y, r, r);
+        g2.draw(circle);
+    }
+    public static void rect(int x, int y, int width, int height) {
+        Graphics2D g2 = (Graphics2D) c.getGraphics();
+        Shape rect = new Rectangle(originX + x, originX + y, width, height);
+        g2.draw(rect);
+    }
+    public static void fillRect(int x1, int y1, int x2, int y2) {
+        Graphics2D g2 = (Graphics2D) c.getGraphics();
+        g2.setColor(Color.WHITE);
+        g2.fillRect(originX + x1, originX + y1, originX + x2, originX + y2);
+    }
+    public static void clearCanvas() {
+        fillRect(0, 0, c.getWidth(), c.getHeight());
+    }
+
+    //basic Fractal tools
+    public static double distance(int XA, int YA, int XB, int YB) {
+        return Math.sqrt((XA - XB) * (XA - XB) + (YA - YB) * (YA - YB));
+    }
+
+    
+    public static void draw() {
+        // drawing code
+        FractalLine base = new FractalLine(0, 300, 2);
+        //, new FractalLine(2 * Math.PI / 3, 200, 2), new FractalLine(4 * Math.PI / 3, 200, 2)];
+            FractalLine recurse = new FractalLine(fracAngle, fracLength, flipA);
+            Fractal list = FPointList.makeFractal(250, 400, base, recurse, flipB, [], 1, iterations);
+
+            //var foo = new FPointList(100, 100, new FractalLine(0, 200, 2));
+            //var fee = new FPointList(100, 100, new FractalLine(0, 0, 0))
+            //foo.replaceLine(fee,recurse,3);
+            moveTo(250, 400);
+            Fractal drawing = list;
+        while (drawing != null) {
+            line(0, 0, x, y);
+            //window.alert(drawing.angle*180/Math.PI + " " + drawing.length);
+            drawing = new Fractal(drawing, nextPoint);
+        }
+
+        moveTo(50, 700);
+        line(0, 0, mouseX, mouseY);
+        line(0, 0, 750, 700);
+        stroke(Color.BLACK);
+
+    }
+
+    public static void flipOne() {
+        if (flipA == 2) {
+            flipA = 3;
+        } else {
+            flipA = 2;
+        }
+        draw();
+    }
+
+    public static void flipTwo() {
+        if (flipB == 2) {
+            flipB = 3;
+        } else {
+            flipB = 2;
+        }
+        draw();
+    }
+    
+    public static void setType(int to) {
+        currentType = to;
+    }
+
+    public static FractalLine makeFLine(int AX, int AY, int BX, int BY, int type) {
+        double length = distance(BX, BY, AX, AY);
+        int delX = (int) FractalLine.prevFPoint.getX() - BX;
+        int delY = (int) FractalLine.prevFPoint.getY() - BY;
+        double angle = Math.atan(delY / delX);
+        if (delX < 0 == Math.cos(angle) < 0) {
+            angle += Math.PI;
+        }
+        return new FractalLine(angle, length, type);
+    }
+
+    public static void nextScreen() {
+        newScreen((screen) % 3 + 1);
+    }
+
+    public static void newScreen(int newScreen) {
+        screen = newScreen;
+        Fractal.clearCanvas();
+        if (newScreen == 1) {
+            pointArray = null;
+            BaseList = null;
+            recList = null;
+            recEnd = null;
+            currentPoint = 0;
+        } else if (newScreen == 2) {
+            BaseList = pointArray;
+            pointArray = makeFLine(0, 0, 400, 50, 0);
+            currentPoint = 0;
+        } else {
+            recList = pointArray;
+            recEnd = currentType;
+            Fractal fractal = Fractal(0, 0, BaseList, recList, recEnd, [], 1);
+        }
+        drawScreen();
+    }
+
+    public static void drawScreen() {
+        if (screen == 3) {
+            moveTo(100, 300);
+            Fractal drawing = fractal;
+            while (drawing != null) {
+                if (drawing.type != 0) {
+                    ctx.lineTo(drawing.X, drawing.Y);
+
+                }
+                drawing = new Fractal(drawing,nextPoint);
+            }
+
+            stroke();
+        }
+    }
+
+    public static void changeIterations(amount) {
+        if (iterations + amount > 0);
+        {
+            iterations += amount;
+            draw();
+        }
+    }
+
+    public static void reset() {
+        iterations = 7;
+        flipA = 2;
+        flipB = 2;
+        fracAngle = startAngle;
+        fracLength = startLength;
+        draw();
     }
     
     //draw fractal each iteration
-    public static void draw(Canvas canvas, int x, int y) {
-        c = canvas;
+    public static void draw(Canvas c, int x, int y) {
+        c = c;
         
         //draw the line and regular line fractal
         if (type == 0) {
-            //get end points of lines
-            int startX = c.getWidth()/8;
-            int startY = (7*c.getHeight())/8;
-            int middleX = x;
-            int middleY = y;
-            int endX = (7*c.getWidth())/8;
-            int endY = (7*c.getHeight())/8;
-            
-            int xRelToStart = x - startX;
-            int yRelToStart = y - startY;
-            int xRelToEnd = x - endX;
-            int yRelToEnd = y - endY;
-            
-            double length1 = Math.sqrt((xRelToStart*xRelToStart)+(yRelToStart*yRelToStart));
-            double length2 = Math.sqrt((xRelToEnd*xRelToEnd)+(yRelToEnd*yRelToEnd));
-            double tempLength1 = Math.sqrt((xRelToStart*xRelToStart)+(yRelToStart*yRelToStart));
-            double tempLength2 = Math.sqrt((xRelToEnd*xRelToEnd)+(yRelToEnd*yRelToEnd));
-            double angle1 = getAngle(startX, startY, x, y);
-            double angle2 = getAngle(x, y, endX, endY);
-            double tempAngle1 = getAngle(startX, startY, x, y);;
-            double tempAngle2 = getAngle(x, y, endX, endY);;
-            
-            int xDif = 0;
-            int yDif = 0;
-            //make guide lines
-            line(startX, startY, x, y);
-            line(x, y, endX, endY);
-            
-            //move guide points to starting line position
-            startX = c.getWidth()/2;
-            startY = c.getHeight()/2;
-            middleX = startX + xRelToStart;
-            middleY = startY + yRelToStart;
-            endX = (7*c.getWidth())/8;
-            endY = c.getHeight()/2;
-            
-//            //iteration 1
-//                line(startX, startY, startX + xRelToStart, startY + yRelToStart);
-//                line(startX + xRelToStart, startY + yRelToStart, endX, endY);
-//            //iteration 2
-//                //something's wrong, I can feel it
-//                line(startX, startY, startX + xRelToStart/2, (startY + yRelToStart)/2);
-//                line(startX + xRelToStart/2, (startY + yRelToStart)/2, startX + (2*xRelToStart)/2, (startY + (2*yRelToStart))/2);
-//                line(startX + (2*xRelToStart)/2, (startY + (2*yRelToStart))/2, startX + (3*xRelToStart)/2, (startY + (3*yRelToStart))/2);
-//                line(startX + (3*xRelToStart)/2, (startY + (3*yRelToStart))/2, endX, endY);
-            for(int i = 0; i < recursions; i++) {
-                tempAngle1 = angle1;
-                tempAngle2 = angle2;
-                
-                xDif = 0;
-                yDif = 0;
-                for (int j = 0; j < Math.pow(2, i); j++) {
-                    //draw the same bent lines on previous lines
-                    startX = (int)(startX + xDif);
-                    startY = (int)(startY + yDif);
-                    middleX = (int)(startX + tempLength1 * Math.cos(tempAngle1));
-                    middleY = (int)(startY + tempLength1 * Math.sin(tempAngle1));
-                    endX = (int)(middleX + tempLength2 * Math.cos(tempAngle2));
-                    endY = (int)(middleY + tempLength2 * Math.sin(tempAngle2));
-                    
-                    tempLength1 *= (length1/(length1+length2));
-                    tempLength2 *= (length2/(length1+length2));
-                    
-                    tempAngle1 += angle1;
-                    tempAngle2 += angle2;
-                    
-                    //get difference in x from each recursion, compound them, and then use them next iteration
-                    xDif += (int)(tempLength1*Math.cos(tempAngle1) + tempLength2*Math.cos(tempAngle2));
-                    yDif += (int)(tempLength1*Math.sin(tempAngle1) + tempLength2*Math.sin(tempAngle2));
-                    
-                    line(startX, startY, middleX, middleY);
-                    line(middleX, middleY, endX, endY);
-                }
-            }
+            //draw a normal fractal
             
         //draw a circle fractal with lobeCount # lobes
         } else if (type == 1) {
@@ -138,27 +261,175 @@ public class Fractal {
     public static void branch(int length) {
         
     }
+}
+class FractalLine{
+    public static int type = 0;
+    public static int recursions = 10;
+    public static int lobeCount = 2;
+    public static int size = 100;
+
+    //Ben Harding's Code here
+    //constants
+    public static int RecursiveConstructerLength = 700;
+    public static double startAngle = 7 * Math.PI / 4;
+    public static double startLength = Math.sqrt(2) * 350;
+
+    //initializing things
+    public static int mouseX = 400;
+    public static int mouseY = 350;
+    public static int x = 0;
+    public static int y = 0;
+    public static int originX = 0;
+    public static int originY = 0;
+
+    public static int flipA = 2;
+    public static int flipB = 2;
+
+    public static double fracAngle = startAngle;
+    public static double fracLength = startLength;
+    public static double angle = startAngle;
+    public static double length = startLength;
+
+    public static Point[] pointArray;
+    public static int currentPoint = 0;
+    public static int iterations = 7;
+    public static int currentType;
+    public static Fractal fractal;
+    public static Point prevFPoint;
     
-    //class drawing tools
-    public static void line(int x1, int y1, int x2, int y2) {
-        c.getGraphics().drawLine(x1, y1, x2, y2);
+    public FractalLine(double Angle, double Length, int Type) {
+        type = Type;//type 0 is invisible, type 1 is normal. type 2 is left-hand recursive. type 3 is flipped recursive
+        angle = Angle;
+        length = Length;
     }
-    public static void circle(int x, int y, int r) {
-        Graphics2D g2 = (Graphics2D) c.getGraphics();
-        Shape circle = new Ellipse2D.Double(x, y, r, r);
-        g2.draw(circle);
+
+    public FractalLine makeInto(double tilt, double scalar, boolean isFlipped) {
+        if (isFlipped) {
+            return new FractalLine(tilt - angle, length * scalar, type);
+        } else {
+            return new FractalLine((tilt + angle), length * scalar, type);
+        }
     }
-    public static void rect(int x, int y, int width, int height) {
-        Graphics2D g2 = (Graphics2D) c.getGraphics();
-        Shape rect = new Rectangle(x, y, width, height);
-        g2.draw(rect);
+
+    public Point findEnd(int X, int Y) {
+        return new Point((int) (Math.cos(angle) * length + X),(int) (Math.sin(angle) * length + Y));
     }
-    public static void fillRect(int x1, int y1, int x2, int y2) {
-        Graphics2D g2 = (Graphics2D) c.getGraphics();
-        g2.setColor(Color.WHITE);
-        g2.fillRect(x1, y1, x2, y2);
+
+}
+
+class FPointList {
+    public static int type = 0;
+    public static int recursions = 10;
+    public static int lobeCount = 2;
+    public static int size = 100;
+
+    //Ben Harding's Code here
+    //constants
+    public static int RecursiveConstructerLength = 700;
+    public static double startAngle = 7 * Math.PI / 4;
+    public static double startLength = Math.sqrt(2) * 350;
+
+    //initializing things
+    public static int mouseX = 400;
+    public static int mouseY = 350;
+    public static int x = 0;
+    public static int y = 0;
+    public static int originX = 0;
+    public static int originY = 0;
+
+    public static int flipA = 2;
+    public static int flipB = 2;
+
+    public static double fracAngle = startAngle;
+    public static double fracLength = startLength;
+    public static double angle = startAngle;
+    public static double length = startLength;
+
+    public static Point[] pointArray;
+    public static int currentPoint = 0;
+    public static int iterations = 7;
+    public static int currentType;
+    public static Fractal fractal;
+    public Point nextPoint;
+    
+    public FPointList(int X, int Y, FractalLine FLine) {
+        Point myPos = FLine.findEnd(X, Y);
+        type = FLine.type;
+        angle = FLine.angle;
+        length = FLine.length;
+        x = X;
+        y = Y;
+        nextPoint = null;
     }
-    public static void clearCanvas() {
-        fillRect(0, 0, c.getWidth(), c.getHeight());
+    
+    public static FPointList makeFractal(int X, int Y, Point [] baseL, Point [] recL, Point recLast, Point [] finL, Point finLast, int n) {
+        //base list, recursive list, finishing list, iterations
+        FPointList output = new FPointList(X, Y, new FractalLine(0, 0, 0));
+        int i = 0;
+        for (i = 0; i < baseL.length; i++) {
+            output.add(baseL[i]);
+        }
+        FPointList current;
+        FPointList next;
+        for (i = 0; i < n - 1; i++) {
+            current = output;
+            while (current.nextPoint != null) {
+                next = current.nextPoint;
+                if (next.type > 1) {
+                    next.replaceLine(current, recL, recLast);
+                }
+                current = next;
+            }
+        }
+
+        current = output;
+        while (current.nextPoint != null) {
+            next = current.nextPoint;
+            if (next.type > 1) {
+                next.replaceLine(current, finL, finLast);
+            }
+            current.angle %= (2 * Math.PI);
+            current = next;
+        }
+        return output;
     }
+    
+
+    public static FPointList getPoint(Point n) {
+        if (n <= 0) {
+            return new FPointList(x, y, new FractalLine(angle, length, type));
+        } else if (nextPoint != null) {
+            return nextPoint.getPoint(n - 1);
+        } else {
+            return null;
+        }
+    }
+
+    public static void replaceLine(Point startFPoint, Point [] a, FractalLine fin) {
+        //a = array of point objects, final = type of 'last' line
+        Point prevFPoint = startFPoint;
+        for (int i = 0; i < a.length; i++) {
+            prevFPoint.nextPoint = new FPointList(prevFPoint.X, prevFPoint.Y, a[i].makeInto(angle, length / RecursiveConstructerLength, type == 3));
+            prevFPoint = prevFPoint.nextPoint;
+        }
+        prevFPoint.nextPoint = this;
+        length = distance(X, Y, prevFPoint.X, prevFPoint.Y);
+        int delX = prevFPoint.X - X;
+        int delY = prevFPoint.Y - Y;
+        angle = Math.atan(delY / delX);
+        if (delX < 0 == Math.cos(angle) < 0) {
+            angle += Math.PI;
+        }
+        type = 1;
+    }
+
+    public static void add(Point point) {
+        if (nextPoint == null) {
+            nextPoint = new FPointList(X, Y, point);
+        } else {
+            nextPoint.add(point);
+        }
+    }
+    
+    public static 
 }

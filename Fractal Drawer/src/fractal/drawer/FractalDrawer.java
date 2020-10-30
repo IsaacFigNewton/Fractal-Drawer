@@ -244,19 +244,21 @@ public class FractalDrawer extends JPanel implements MouseMotionListener {
     public void mouseDragged(MouseEvent e) {
         //debugging
 //        eventOutput("Mouse dragged to", e);
-        
-//        int range = 100;
-//        //only function if the cursor is clicked and dragged some distance from the last point of contact, for continuity sake
-//        if(Math.abs(mouseX - e.getX()) <= range && Math.abs(mouseY - e.getY()) <= range) {
-        //for class
-        mouseX = e.getX();
-        mouseY = e.getY();
+        int x = e.getX();
+        int y = e.getY();
 
-        //clear canvas
-        fillRect(0, 0, c.getWidth(), c.getHeight());
-        //draw fractal
-        Fractal.draw(c, e.getX(), e.getY());
-//        }
+        Fractal.length = Fractal.distance(50, 700, x, y);
+        int delX = 50 - x;
+        int delY = 700 - y;
+        Fractal.fracAngle = Math.atan(delY / delX);
+        if (delX < 0 == Math.cos(Fractal.fracAngle) < 0) {
+            Fractal.fracAngle += Math.PI;
+        }
+
+        mouseX = x;
+        mouseY = y;
+
+        Fractal.draw();
     }
     
     //Other methods
@@ -271,10 +273,11 @@ public class FractalDrawer extends JPanel implements MouseMotionListener {
 
 /*                                 Sources:
 ********************************************************************************
-Template and drawing tools:     SLOHS, SLO, CA.
-Mouse events:                   https://www.geeksforgeeks.org/mouselistener-mousemotionlistener-java/
-Mouse Motion Listener Tutorial: https://docs.oracle.com/javase/tutorial/uiswing/examples/events/index.html#MouseMotionEventDemo
-Button Listeners:               https://stackoverflow.com/questions/21879243/how-to-create-on-click-event-for-buttons-in-swing/21879526
-Angle Calculation:              https://stackoverflow.com/questions/9970281/java-calculating-the-angle-between-two-points-in-degrees
+Inspiration:                                    https://goldboba49300.github.io/FastidiousFractals2019/index.html
+Template and drawing tools:                     SLOHS, SLO, CA.
+Mouse events:                                   https://www.geeksforgeeks.org/mouselistener-mousemotionlistener-java/
+Mouse Motion Listener Tutorial:                 https://docs.oracle.com/javase/tutorial/uiswing/examples/events/index.html#MouseMotionEventDemo
+Button Listeners:                               https://stackoverflow.com/questions/21879243/how-to-create-on-click-event-for-buttons-in-swing/21879526
+Ben Harding's Fractal Code Bits (Javascript):   https://github.com/goldBoba49300/FastidiousFractals2019/commit/ead63b748d5a6e50c1472970ef81d6a9e8ba7b20
 
 */
