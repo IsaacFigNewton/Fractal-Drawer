@@ -199,7 +199,7 @@ public class FractalDrawer extends JPanel implements MouseMotionListener {
     }
     
     //class setters
-    public static void stroke(Color theColor) {
+     public static void stroke(Color theColor) {
         c.getGraphics().setColor(theColor);
     }
     public void setBackground(Color theColor) {
